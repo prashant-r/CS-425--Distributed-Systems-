@@ -25,36 +25,36 @@ import java.util.Set;
 public class RecordedState implements Serializable {
 
 	// put your implementation here
-
+        private int pro_id;
 	private double balance;
-
+        private double widgets;
 	private ArrayList<Collector> collectors;
 	private ArrayList<MoneyMessage> msgs;
 	private Set<Integer> activeChannels;
 
-	public RecordedState(ArrayList<Collector> collectors) {
+	public RecordedState(ArrayList<Collector> collectors, int pro_id) {
 		msgs = new ArrayList<MoneyMessage>();
 		this.collectors = new ArrayList<Collector>();
 		this.collectors = collectors;
 		activeChannels = new HashSet<Integer>();
-
+                this.pro_id = pro_id;
 	}
 
-	public void stopRecord(int id) {
+	public void stopRecord(int id, int timestamp1, int[] timestamp2) {
 		activeChannels.remove(id);
 
 		if (activeChannels.size() == 0) {
 
 			for (Collector c : collectors) {
-				sendState(c);
+				sendState(c, timestamp1, timestamp2);
 			}
 		}
 
 	}
 
-	public void saveState(double balance, Set<Integer> neighbors) {
+	public void saveState(double balance, double widgets, Set<Integer> neighbors) {
 		this.balance = balance;
-
+                this.widgets = widgets;
 		activeChannels.addAll(neighbors);
 
 	}
@@ -77,14 +77,18 @@ public class RecordedState implements Serializable {
 		balance = 0;
 	}
 
-	private void sendState(Collector collector) {
+	private void sendState(Collector collector, int timestamp1, int[] timestamp2) {
 		try {
 			Socket socket = new Socket(collector.getAddress(),
 					collector.getPort());
 
 			ObjectOutputStream out = new ObjectOutputStream(
 					socket.getOutputStream());
+                        out.writeObject(pro_id);
 			out.writeObject(balance);
+                        out.writeObject(widgets);
+                        out.writeObject(timestamp1);
+                        out.writeObject(timestamp2);
 			out.writeObject(msgs);
 			out.flush();
 			out.close();
