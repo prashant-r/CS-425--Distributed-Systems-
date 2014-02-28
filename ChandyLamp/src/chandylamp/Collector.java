@@ -13,6 +13,9 @@ package chandylamp;
  * @author Prashant
  */
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.ServerSocket;
@@ -32,6 +35,8 @@ public class Collector implements Runnable {
         double widgets[];
         int[] timestamp1;
         int[][] timestamp2;
+        File logfile;
+        BufferedWriter writer;
 	//double sumStates;
 	//double sumChannels;
 
@@ -46,6 +51,10 @@ public class Collector implements Runnable {
                 message = new ArrayList<MoneyMessage>();
                 snapshots = 0;
                 this.snap_num = snap_num;
+                this.logfile = new File("log.txt");
+                try{
+                    writer = new BufferedWriter(new FileWriter(logfile));
+                }catch(Exception e){e.printStackTrace();}
 	}
 
 	@Override
@@ -97,26 +106,36 @@ public class Collector implements Runnable {
 
 	public void printToConsole() {
                 snapshots++;
-		System.out.println("------------------------------");
+                try{
+		writer.write("------------------------------");
+                System.out.printf("------------------------------\n");
+                writer.newLine();
 		//System.out.println("Total amount of money is: "
 		//		+ (sumStates + sumChannels));
                 for(int j = 0; j<processCount; j++){
-                    System.out.printf("snapshot %d process %d logical %d ", snapshots, j+1, timestamp1[j]);
-                    System.out.printf("vector ");
+                    writer.write("snapshot ");writer.write(Integer.toString(snapshots));writer.write(" process ");writer.write(Integer.toString(j+1));writer.write(" logical ");writer.write(Integer.toString(timestamp1[j]));
+                    writer.write(" vector ");
+                    System.out.printf("snapshot %d process %d logical %d vector ", snapshots, j+1, timestamp1[j]);
                     for(int i = 0; i<processCount; i++){
+                        writer.write(Integer.toString(timestamp2[j][i]));writer.write(" ");
                         System.out.printf("%d ",timestamp2[j][i]);
                     }
-                    System.out.printf(" Money %f$", balance[j]);
-                    System.out.printf(" Widgets %f", widgets[j]);
-                    System.out.printf("\n");
+                    writer.write("Money ");writer.write(Integer.toString((int)balance[j]));writer.write(" $");
+                    writer.write(" Widgets ");writer.write(Integer.toString((int)widgets[j]));
+                    writer.newLine();
+                    System.out.printf("Money %f $ Widgets %f", balance[j], widgets[j]);
                     for(int i = 0; i<message.size(); i++){
                         if(message.get(i).getReceiver() == j+1){
                             System.out.printf("Message from %d to %d with %f $ and %f widgets \n", message.get(i).getSender(), message.get(i).getReceiver(), message.get(i).amount, message.get(i).widgetamount);
+                            writer.write("Message from ");writer.write(Integer.toString(message.get(i).getSender()));writer.write(" to ");writer.write(Integer.toString(message.get(i).getReceiver()));writer.write(" with ");writer.write(Integer.toString((int)message.get(i).getAmount()));writer.write(" $ and widgets ");writer.write(Integer.toString((int)message.get(i).getWidget()));writer.newLine();
                         }
                     }
                     System.out.printf("\n");
+                    writer.newLine();
                 }
                 message.clear();
+                if(snapshots == snap_num){writer.close();}
+                }catch(Exception e){e.printStackTrace();}
 		//System.out.println("Total amount of money in states is: " + sumStates);
 		//System.out.println("Total amount of money in channels is: "
 		//		+ sumChannels);

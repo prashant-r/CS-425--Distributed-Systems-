@@ -2,7 +2,7 @@ package chandylamp;
 
 import java.util.Scanner;
 import java.util.Random;
-import java.util.ArrayList;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -129,7 +129,11 @@ public class Main implements Runnable {
 	}
 	@Override
 	public void run() {
-		//Test scenario
+		//Test scenarioBufferedWriter writer = null;
+            //create a temporary file
+            
+
+
 		try {
 			//p1.saveCurrentState();
 			//p2.transferMoney(170, p1);
@@ -156,7 +160,7 @@ public class Main implements Runnable {
                                 while(widget_transfer == 0){widget_transfer = generator.nextInt((int)process[money_transfer_process].getWidget());}//System.out.println("here");
                             }
                             process[money_transfer_process].transferMoney(money_transfer, widget_transfer, process[money_transfer_process_destination]);
-                            Thread.sleep(100);
+                            Thread.sleep(200);
                             //money_transfer_process = generator.nextInt(process_num);
                             //money_transfer = Math.abs(generator.nextInt());
                             //while(money_transfer == 0 || money_transfer > process[money_transfer_process].getBalance()){money_transfer = Math.abs(generator.nextInt());}
